@@ -18,7 +18,7 @@ ATENCIÓN: Tener en cuenta que este Lapiz utiliza un PTC para el sensado de la t
 </p>
 
 
-# Caracteristicas
+## Caracteristicas
 
   * ESD, Antiestático
   * Tensión: 24 Vac 

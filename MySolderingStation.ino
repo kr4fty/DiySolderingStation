@@ -154,10 +154,14 @@ void loop() {
   }// fin seleccion de proceso
 
   // control PID
-  adc= analogRead(TcPin);
-  input = map(adc, 190, 555, 10, 360);
+  adc = analogRead(TcPin);
+  if(adc<325) // es para hacer un estimativo a temperaturas menores a 150ºc
+    input = map(adc, 190, 555, 10, 360);  // entre 10 y 150 ºc
+  else        // a partir de 150ºc el ptc tiene mayor precision en la medicion
+    input = map(adc, 345, 535, 150, 300); // entre 150 y 300 ºc
   newTemp = (float)input;
   newTemp = (float)((X*oldTemp + newTemp)/(X+1)); // Filtro digital pasa bajos
+  input = newTemp;
 
   cNt = (uint8_t)(newTemp/100);
   dNt = (uint8_t)((uint16_t)newTemp%100)/10;
