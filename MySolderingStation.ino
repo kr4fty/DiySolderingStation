@@ -1,3 +1,11 @@
+/*
+ * Estacion de soldado hecho sobre un ATMEGA328p utilizando un Lapiz compatible
+ * con la estacion HAKKO 907 (con ESD)
+ *
+ * Autor:
+ *       Tapia Favio ( technicc(at)gmail.com )
+*/
+
 #include <Arduino.h>
 #include <PID_v1.h>
 #include <Wire.h>
@@ -65,11 +73,12 @@ void setup() {
   lcd.init();
   lcd.cp437(true);
   lcd.setContrast(75);
-  lcd.setTextColor(BLACK, WHITE);
-  lcd.clearDisplay();
   digitalWrite(LCDBACKLIGHTPIN, HIGH);
-  lcd.clearDisplay();
+  printBase();
 
+/*
+ * Recupero la ultima temperatura seteada. La misma se guarda en la EEPROM
+*/
   _eeprom.sp_uint8[0]= EEPROM.read(0);
   _eeprom.sp_uint8[1]= EEPROM.read(1);
   if(_eeprom.setPoint_ee>500)
@@ -77,7 +86,6 @@ void setup() {
 
   myEnc.write(_eeprom.setPoint_ee);
 
-  printBase();
   #ifdef DEBUG
     Serial.begin(9600);
   #endif
@@ -90,15 +98,16 @@ void loop() {
   bool          button;
 
 /* Inicio de seleccion de proceso
- * si es la primera que se ejecuta o cancelo la tarea previa, entonces:
+ *
+ *   si es la primera que se ejecuta o cancelo la tarea previa, entonces:
  *      - mueva el encoder para seleciona la temperatura deseada
  *      - y con un pulso corto se comienza el proceso de calentar la punta
  *      - un pulso largo no tiene efecto alguno aca
- * si el sistema ya estaba funcionando y con una temperatura setada, entonces
+ *   si el sistema ya estaba funcionando y con una temperatura setada, entonces
  *      - un pulso corto PAUSA/DETIENE el calentamiento de la punta
  *      - con solo mover el encoder, el setPoint se setea automaticamente a la
  *        posicion
- * y si el sistema ya estaba seteado la temperatura pero pausado/detenido:
+ *   y si el sistema ya estaba seteado la temperatura pero pausado/detenido:
  *      - un pulso corto REANUDA el proceso
  *      - un pulso largo CANCELA el proceso
  */
@@ -110,8 +119,8 @@ void loop() {
     while(!button)
       button = digitalRead(BUTTON);
     if(millis()<(timePush+200) || firstTime){
-      if(firstTime){
-        firstTime = false;
+      if(firstTime){        // Solo se ejecuta cuando arranca o cuando se
+        firstTime = false;  // cancela el proceso actual
 
         _eeprom.setPoint_ee = newPos;
         EEPROM.write(0, _eeprom.sp_uint8[0]);
@@ -177,6 +186,11 @@ void loop() {
   dNt = (uint8_t)((uint16_t)newTemp%100)/10;  // decena  de newTemp
   uNt = (uint8_t)((uint16_t)newTemp%10);      // unidad  de newTemp
 
+/*
+ * Una vez que se seleciono el setPoint y se dio arranque al proceso, el PID
+ * se encargara de mantener la temperatura lo mas estable posible. Solo se
+ * ejecuta si el proceso NO esta pausado/detenido.
+*/
   if(enabled){
     gap = abs(setPoint-input);
     if(gap<5){
@@ -197,8 +211,14 @@ void loop() {
     output = 0;
   // fin control PID
 
+/*
+ * El setPoint esta seteado sin importar so se esta ejecutando o esta detenido,
+ * por lo que llegado a un determinado margen de temperaturas, el LED comenzara
+ * a parpadear, mas o menos rapido, depdendiendo de que tan cerca este de la
+ * temperatura fijada.
+*/
   if(!firstTime){
-    // si esta dentro del rango (+- 10), hago parpadear el led
+    // si esta dentro del rango (±15), hago parpadear el led
     if(newTemp<=setPoint-15){
       digitalWrite(LEDPIN, LOW);
       timeChange = 0;
@@ -239,6 +259,7 @@ void loop() {
     Serial.println((stop-start));
   #endif
 }
+// Solo se imprime la primera vez o cuando se ha cancelado el proceso
 void printBase(){
   lcd.clearDisplay();
   lcd.setTextColor(BLACK, WHITE);
@@ -252,6 +273,13 @@ void printBase(){
 
   lcd.display();
 }
+/*
+ * Se buscaba imprimir solo el caracter que se modifico, logrando de esta manera
+ * acelerar el refresco de la pantalla.
+ * Si en cambio se borra e imprime en cada ciclo de loop(), el mismo tomaba unos
+ * 500ms debido a que el lcd es i²c lo que de buenas a primeras ya es un
+ * protocolo muy lento en comparacion a SPI, por ejemplo.
+*/
 void updateDisplay()  // se muestra en el display
 {
   if(firstTime && !enabled)
@@ -345,13 +373,21 @@ void updateDisplay()  // se muestra en el display
 }
 
 // ISR's
+/*
+ * Encargada de detectar cuando la onda senoidal CRUZA POR CERO
+ * Recordar que un TRIAC una vez que se activa, la misma conduce hasta que entre
+ * T1 y T2 haya 0Vac, osea, la onda senoidal cuando cruza por cero lo desactiva
+ * automaticamente. Por lo que en cada cruce se debera activar pasado un tiempo
+ * de espera "dimtime".
+*/
 void zeroCrossInterrupt()
 {
   int dimming;
 
   digitalWrite(acPwmPin, LOW);
   if(output>=0){
-    dimming = STEPS - output;
+    dimming = STEPS - output; // Invierto por que una vez activado el triac no
+                              // se desactiva hasta el proximo cruce por cero
     if(dimming==0){
       zc = false;
       digitalWrite(acPwmPin, HIGH);
@@ -365,6 +401,12 @@ void zeroCrossInterrupt()
     }
   }
 }
+/*
+ * Encargada de encender el triac tras la espera de tiempo "dimtime", simulando
+ * ser el control por PWM de continua, en este caso es un control de fase.
+ * Solo actua si "dimtime" esta entre 0<dimtime<255. Los casos particulares son
+ * cuando es 0:siempre encendido, 255: siempre apagado.
+*/
 void dim_check() {
   if(zc == true){
     if(cont>=dimtime) {
