@@ -37,7 +37,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title "Soldering Station - Hakko 936 compatible"
-Date "2017-07-07"
+Date "2017-07-13"
 Rev "1.0"
 Comp ""
 Comment1 ""
@@ -499,12 +499,12 @@ $EndComp
 $Comp
 L R R9
 U 1 1 595F902C
-P 6750 5550
-F 0 "R9" V 6830 5550 50  0000 C CNN
-F 1 "1K" V 6750 5550 50  0000 C CNN
-F 2 "Resistors_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal" V 6680 5550 50  0001 C CNN
-F 3 "" H 6750 5550 50  0001 C CNN
-	1    6750 5550
+P 6650 5550
+F 0 "R9" V 6730 5550 50  0000 C CNN
+F 1 "1K" V 6650 5550 50  0000 C CNN
+F 2 "Resistors_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal" V 6580 5550 50  0001 C CNN
+F 3 "" H 6650 5550 50  0001 C CNN
+	1    6650 5550
 	0    1    1    0   
 $EndComp
 $Comp
@@ -606,43 +606,43 @@ F 3 "" H 8250 6000 50  0001 C CNN
 	1    8250 6000
 	1    0    0    -1  
 $EndComp
-Text GLabel 6550 5550 0    43   Input ~ 0
+Text GLabel 6450 5550 0    43   Input ~ 0
 PTC+
 $Comp
 L GND #PWR013
 U 1 1 595FB8B5
-P 6650 6000
-F 0 "#PWR013" H 6650 5750 50  0001 C CNN
-F 1 "GND" H 6650 5850 50  0000 C CNN
-F 2 "" H 6650 6000 50  0001 C CNN
-F 3 "" H 6650 6000 50  0001 C CNN
-	1    6650 6000
+P 6550 6000
+F 0 "#PWR013" H 6550 5750 50  0001 C CNN
+F 1 "GND" H 6550 5850 50  0000 C CNN
+F 2 "" H 6550 6000 50  0001 C CNN
+F 3 "" H 6550 6000 50  0001 C CNN
+	1    6550 6000
 	1    0    0    -1  
 $EndComp
-Text GLabel 6550 5950 0    43   Input ~ 0
+Text GLabel 6450 5950 0    43   Input ~ 0
 PTC-
 Text GLabel 9050 5750 2    43   Input ~ 0
 A0
 $Comp
 L CONN_01X04 J4
 U 1 1 595FC993
-P 2200 5250
-F 0 "J4" H 2200 5500 50  0000 C CNN
-F 1 "PAD_FEMALE" V 2300 5250 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm" H 2200 5250 50  0001 C CNN
-F 3 "" H 2200 5250 50  0001 C CNN
-	1    2200 5250
+P 2100 5250
+F 0 "J4" H 2100 5500 50  0000 C CNN
+F 1 "PAD_FEMALE" V 2200 5250 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm" H 2100 5250 50  0001 C CNN
+F 3 "" H 2100 5250 50  0001 C CNN
+	1    2100 5250
 	-1   0    0    -1  
 $EndComp
 $Comp
 L CONN_01X04 J3
 U 1 1 595FCBE4
-P 1900 5250
-F 0 "J3" H 1900 5500 50  0000 C CNN
-F 1 "PAD_MALE" V 2000 5250 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm" H 1900 5250 50  0001 C CNN
-F 3 "" H 1900 5250 50  0001 C CNN
-	1    1900 5250
+P 1800 5250
+F 0 "J3" H 1800 5500 50  0000 C CNN
+F 1 "PAD_MALE" V 1900 5250 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm" H 1800 5250 50  0001 C CNN
+F 3 "" H 1800 5250 50  0001 C CNN
+	1    1800 5250
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -659,12 +659,12 @@ $EndComp
 $Comp
 L SW_Push SW2
 U 1 1 595FD28F
-P 4600 4300
-F 0 "SW2" H 4650 4400 50  0000 L CNN
-F 1 "SELECT" H 4600 4240 50  0000 C CNN
-F 2 "Buttons_Switches_THT:SW_PUSH_6mm" H 4600 4500 50  0001 C CNN
-F 3 "" H 4600 4500 50  0001 C CNN
-	1    4600 4300
+P 4600 4150
+F 0 "SW2" H 4650 4250 50  0000 L CNN
+F 1 "SELECT" H 4600 4090 50  0000 C CNN
+F 2 "Buttons_Switches_THT:SW_PUSH_6mm" H 4600 4350 50  0001 C CNN
+F 3 "" H 4600 4350 50  0001 C CNN
+	1    4600 4150
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -722,11 +722,11 @@ F 3 "" H 4300 5600 50  0001 C CNN
 	1    4300 5600
 	1    0    0    -1  
 $EndComp
-Text Label 2400 5200 0    43   ~ 0
+Text Label 2300 5200 0    43   ~ 0
 BUTTON
-Text Label 2400 5300 0    43   ~ 0
+Text Label 2300 5300 0    43   ~ 0
 ENC_B
-Text Label 2400 5400 0    43   ~ 0
+Text Label 2300 5400 0    43   ~ 0
 ENC_A
 $Comp
 L R R15
@@ -750,13 +750,13 @@ F 3 "" H 2800 4100 50  0001 C CNN
 	1    2800 4100
 	-1   0    0    1   
 $EndComp
-Text GLabel 1650 5100 0    43   Input ~ 0
+Text GLabel 1550 5100 0    43   Input ~ 0
 D5
-Text GLabel 1650 5200 0    43   Input ~ 0
+Text GLabel 1550 5200 0    43   Input ~ 0
 D6
-Text GLabel 1650 5300 0    43   Input ~ 0
+Text GLabel 1550 5300 0    43   Input ~ 0
 D7
-Text GLabel 1650 5400 0    43   Input ~ 0
+Text GLabel 1550 5400 0    43   Input ~ 0
 D8
 $Comp
 L CONN_01X05 J5
@@ -1066,23 +1066,23 @@ $EndComp
 $Comp
 L CONN_01X02 J13
 U 1 1 59613DB1
-P 4600 4600
-F 0 "J13" H 4600 4750 50  0000 C CNN
-F 1 "BUTTON_FEMALE" V 4700 4600 50  0000 C CNN
-F 2 "Connectors:PINHEAD1-2" H 4600 4600 50  0001 C CNN
-F 3 "" H 4600 4600 50  0001 C CNN
-	1    4600 4600
+P 4600 4450
+F 0 "J13" H 4600 4600 50  0000 C CNN
+F 1 "BUTTON_FEMALE" V 4700 4450 50  0000 C CNN
+F 2 "Connectors:PINHEAD1-2" H 4600 4450 50  0001 C CNN
+F 3 "" H 4600 4450 50  0001 C CNN
+	1    4600 4450
 	0    -1   1    0   
 $EndComp
 $Comp
 L CONN_01X02 J14
 U 1 1 59613EFF
-P 4600 4900
-F 0 "J14" H 4600 5050 50  0000 C CNN
-F 1 "BUTTON_MALE" V 4700 4900 50  0000 C CNN
-F 2 "Connectors:PINHEAD1-2" H 4600 4900 50  0001 C CNN
-F 3 "" H 4600 4900 50  0001 C CNN
-	1    4600 4900
+P 4600 4750
+F 0 "J14" H 4600 4900 50  0000 C CNN
+F 1 "BUTTON_MALE" V 4700 4750 50  0000 C CNN
+F 2 "Connectors:PINHEAD1-2" H 4600 4750 50  0001 C CNN
+F 3 "" H 4600 4750 50  0001 C CNN
+	1    4600 4750
 	0    -1   -1   0   
 $EndComp
 $Comp
@@ -1176,6 +1176,29 @@ Text Label 5250 6800 2    43   ~ 0
 DTA
 Text Label 5250 6600 2    43   ~ 0
 3.3V
+Text Notes 1200 3950 0    118  ~ 0
+En Chasis
+Text Notes 800  2500 0    118  ~ 0
+Detector de cruce por cero
+Text Notes 4150 3300 0    118  ~ 0
+AC Phace Control
+Text Notes 6200 5000 0    118  ~ 0
+PTC Amplificador
+Text Notes 10150 800  0    157  ~ 0
+Arduino
+Text Notes 9850 5000 0    118  ~ 0
+Conector DIN
+$Comp
+L C C13
+U 1 1 596804A7
+P 6850 5750
+F 0 "C13" H 6875 5850 50  0000 L CNN
+F 1 "100n" H 6875 5650 50  0000 L CNN
+F 2 "Capacitors_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm" H 6888 5600 50  0001 C CNN
+F 3 "" H 6850 5750 50  0001 C CNN
+	1    6850 5750
+	1    0    0    -1  
+$EndComp
 Wire Wire Line
 	2150 1100 2900 1100
 Wire Wire Line
@@ -1381,7 +1404,7 @@ Wire Wire Line
 	6650 2950 6800 2950
 Connection ~ 6350 3250
 Wire Wire Line
-	6900 5550 7100 5550
+	6800 5550 7100 5550
 Wire Wire Line
 	7700 5650 7850 5650
 Wire Wire Line
@@ -1430,18 +1453,18 @@ Wire Wire Line
 Wire Wire Line
 	7050 5750 7050 6000
 Wire Wire Line
-	6600 5550 6550 5550
+	6500 5550 6450 5550
 Wire Wire Line
-	6650 5950 6650 6000
+	6550 5950 6550 6000
 Wire Wire Line
-	6550 5950 6650 5950
+	6450 5950 6550 5950
 Connection ~ 9000 5750
 Wire Wire Line
-	2400 5400 3550 5400
+	2300 5400 3550 5400
 Wire Wire Line
 	3550 5400 3550 4950
 Wire Wire Line
-	2400 5300 3750 5300
+	2300 5300 3750 5300
 Wire Wire Line
 	3750 5300 3750 4950
 Connection ~ 3000 5750
@@ -1467,22 +1490,22 @@ Wire Wire Line
 Wire Wire Line
 	3800 5400 3800 5200
 Wire Wire Line
-	3800 5200 2400 5200
+	3800 5200 2300 5200
 Connection ~ 4300 5400
 Wire Wire Line
-	1700 5100 1650 5100
+	1600 5100 1550 5100
 Wire Wire Line
-	1700 5200 1650 5200
+	1600 5200 1550 5200
 Wire Wire Line
-	1700 5300 1650 5300
+	1600 5300 1550 5300
 Wire Wire Line
-	1700 5400 1650 5400
+	1600 5400 1550 5400
 Wire Wire Line
 	3350 3000 3500 3000
 Connection ~ 3400 3000
 Connection ~ 4300 5100
 Wire Wire Line
-	2400 5100 2450 5100
+	2300 5100 2450 5100
 Wire Wire Line
 	1600 6250 1550 6250
 Wire Wire Line
@@ -1591,13 +1614,13 @@ Wire Wire Line
 Wire Wire Line
 	950  1000 950  650 
 Wire Wire Line
-	4650 4400 4800 4400
+	4650 4250 4800 4250
 Wire Wire Line
-	4800 4400 4800 4300
+	4800 4250 4800 4150
 Wire Wire Line
-	4550 4400 4400 4400
+	4550 4250 4400 4250
 Wire Wire Line
-	4400 4400 4400 4300
+	4400 4250 4400 4150
 Wire Wire Line
 	4850 5100 4650 5100
 Wire Wire Line
@@ -1704,20 +1727,28 @@ Wire Notes Line
 	11100 6200 9800 6200
 Wire Notes Line
 	9800 6200 9800 4750
-Text Notes 1200 3950 0    118  ~ 0
-En Chasis
-Text Notes 800  2500 0    118  ~ 0
-Detector de cruce por cero
-Text Notes 4150 3300 0    118  ~ 0
-AC Phace Control
-Text Notes 6200 5000 0    118  ~ 0
-PTC Amplificador
 Wire Notes Line
 	9250 4800 9250 6200
 Wire Notes Line
 	6200 4800 6200 6200
-Text Notes 10150 800  0    157  ~ 0
-Arduino
-Text Notes 9850 5000 0    118  ~ 0
-Conector DIN
+Wire Wire Line
+	4550 5100 4550 4950
+Wire Wire Line
+	4650 5100 4650 4950
+Wire Wire Line
+	6850 5600 6850 5550
+Connection ~ 6850 5550
+$Comp
+L GND #PWR019
+U 1 1 59682210
+P 6850 6000
+F 0 "#PWR019" H 6850 5750 50  0001 C CNN
+F 1 "GND" H 6850 5850 50  0000 C CNN
+F 2 "" H 6850 6000 50  0001 C CNN
+F 3 "" H 6850 6000 50  0001 C CNN
+	1    6850 6000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6850 5900 6850 6000
 $EndSCHEMATC
