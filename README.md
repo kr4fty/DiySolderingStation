@@ -27,9 +27,9 @@ ATENCIÓN: Tener en cuenta que este Lapiz utiliza un PTC para el sensado de la t
 
 ## Partes
 
-  * LCD del tipo I²C: se utilizó un lcd de un Motorola C115
-  * Encoder rotatorio
-  * Punta/lapiz de Estación de soldado, compatible con HAKKO 907
+  * LCD del tipo I²C: se utilizó un lcd de un Motorola C115 (chipset ST7558)
+  * Encoder rotatorio para chasis
+  * Punta/lapiz de Estación de soldado, compatible con HAKKO 907 (DIN 5 ESD)
   * Botón para chasis
   * Controlador (incluido en el repositorio)
 

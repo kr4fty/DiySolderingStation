@@ -1,14 +1,14 @@
-#define   LIBCALL_ENABLEINTERRUPT
-#include  <Arduino.h>
-#include  <PID_v1.h>
-#include  <Wire.h>
-#include  <Adafruit_GFX.h>
-#include  <ST7558.h>
-#include  <TimerOne.h>
-#include  <EnableInterrupt.h>
-#include  <EncoderPCI.h>
-#include  <EEPROM.h>
-#include  "config.h"
+#include <Arduino.h>
+#include <PID_v1.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <ST7558.h>
+#include <TimerOne.h>
+#define  LIBCALL_ENABLEINTERRUPT
+#include <EnableInterrupt.h>
+#include <EncoderPCI.h>
+#include <EEPROM.h>
+#include "config.h"
 
 double   setPoint,
          input,
@@ -23,12 +23,24 @@ volatile bool     zc;
 volatile uint16_t dimtime;
 volatile uint8_t  cont;
 
+unsigned long nextCheck, nextCheckLed, timePush, timeChange;
+uint16_t oldAdc, adc;
+uint16_t newPos, oldPos;
+uint16_t oldSetPoint;
+uint8_t  uNt, dNt, cNt, uOt, dOt, cOt;
+bool     enabled=false, oldEnabled, firstTime=true, BoN;
+bool     ledSate;
+
+#ifdef DEBUG
+  unsigned long start, stop;
+#endif
+
 union {
   uint16_t setPoint_ee;
   uint8_t sp_uint8[2];
 }_eeprom;
 
-PID      myPID(&input, &output, &setPoint, aggKp, aggKi, aggKd, DIRECT);
+PID      myPID(&input, &output, &setPoint, consKp, consKi, consKd, DIRECT);
 ST7558   lcd(LCDRESETPIN);
 Encoder  myEnc(INA, INB);
 
@@ -55,10 +67,7 @@ void setup() {
   lcd.setContrast(75);
   lcd.setTextColor(BLACK, WHITE);
   lcd.clearDisplay();
-  lcd.print("booting...");
-  lcd.display();
   digitalWrite(LCDBACKLIGHTPIN, HIGH);
-  delay(500);
   lcd.clearDisplay();
 
   _eeprom.sp_uint8[0]= EEPROM.read(0);
@@ -74,25 +83,14 @@ void setup() {
   #endif
 }
 
-float         newTemp=0, oldTemp=5;
-unsigned long nextCheck, nextCheckLed, timePush, timeChange;
-int16_t       gap, adc;
-uint8_t       tuningState=2;       // 0: conservative, 1: agresive
-
-long          newPos, oldPos;
-uint8_t       uNt, dNt, cNt, uOt, dOt, cOt;
-uint8_t       button;
-bool          enabled=false, oldEnabled, firstTime=true, BoN, ledSate;
-uint16_t      oldSetPoint;
-
-#ifdef DEBUG
-  unsigned long start, stop;
-#endif
-
 void loop() {
   // put your main code here, to run repeatedly:
-// inicio de seleccion de proceso
-/* si es la primera que se ejecuta o cancelo la tarea previa, entonces:
+  uint16_t      gap, newTemp=0;
+  bool          tuningState=false;       // 0: conservative, 1: agresive
+  bool          button;
+
+/* Inicio de seleccion de proceso
+ * si es la primera que se ejecuta o cancelo la tarea previa, entonces:
  *      - mueva el encoder para seleciona la temperatura deseada
  *      - y con un pulso corto se comienza el proceso de calentar la punta
  *      - un pulso largo no tiene efecto alguno aca
@@ -135,7 +133,7 @@ void loop() {
       if(!enabled){ // Cancelo el proceso actual
         firstTime = true;
         oldPos--;  // Para evitar que quede el texto en blanco sobre negro
-        oldTemp--; // Como la condicion para actualizar el display es que
+                   // Como la condicion para actualizar el display es que
         dOt--;     // cambien los vlores actuales en comparacion a los guardados
         cOt--;     // entonces fuerzo a que sean distintos. De este modo voy a
         uOt--;     // mostrar el estado de la temperatura como del setPoint
@@ -155,20 +153,32 @@ void loop() {
 
   // control PID
   adc = analogRead(TcPin);
-  if(adc<325) // es para hacer un estimativo a temperaturas menores a 150ºc
-    input = map(adc, 190, 555, 10, 360);  // entre 10 y 150 ºc
-  else        // a partir de 150ºc el ptc tiene mayor precision en la medicion
-    input = map(adc, 345, 535, 150, 300); // entre 150 y 300 ºc
-  newTemp = (float)input;
-  newTemp = (float)((X*oldTemp + newTemp)/(X+1)); // Filtro digital pasa bajos
-  input = newTemp;
+  adc = (float)((X*oldAdc + adc)/(X+1));      // Filtro digital pasa bajos
+  oldAdc = (uint16_t)adc;
 
-  cNt = (uint8_t)(newTemp/100);
-  dNt = (uint8_t)((uint16_t)newTemp%100)/10;
-  uNt = (uint8_t)((uint16_t)newTemp%10);
+  if(adc<338) // es para hacer un estimativo a temperaturas menores de 150ºc
+    input = map(oldAdc, 172, 338, 0, 150);  // entre 0 y 150 ºc
+  else        // a partir de 150ºc el ptc tiene mayor precision en la medicion
+    input = map(oldAdc, 338, 585, 150, 350); // entre 150 y 350 ºc
+  if(input<0)
+    input = 0;
+
+  newTemp = (uint16_t)input;
+
+/*
+ *  Descompongo newTemp en sus digitos, centena-decena-unidad, para lograr una
+ *  mayor velocidad en la actualizacion del display. Resulta mas rapido imprimir
+ *  el digito que cambio en lugar de todo el numero.
+ *   ejemplo:
+ *           si newTemp = 359
+ *                           => cNT=3, dNt=5 y uNt=9
+*/
+  cNt = (uint8_t)(newTemp/100);               // centena de newTemp
+  dNt = (uint8_t)((uint16_t)newTemp%100)/10;  // decena  de newTemp
+  uNt = (uint8_t)((uint16_t)newTemp%10);      // unidad  de newTemp
 
   if(enabled){
-    gap = abs(setPoint -input);
+    gap = abs(setPoint-input);
     if(gap<5){
       if(tuningState!=0){
         myPID.SetTunings(consKp, consKi, consKd);
@@ -212,7 +222,7 @@ void loop() {
       }
     }
     if(millis()>nextCheck){
-      nextCheck+=500;
+      nextCheck += 500;
       // Muestro el setPoint parpadeando si no modifico la pos del encoder
       BoN = not BoN;
     }
@@ -234,11 +244,11 @@ void printBase(){
   lcd.setTextColor(BLACK, WHITE);
   lcd.setCursor(0, 0);
   lcd.setTextSize(2);
-  lcd.print("T: ");
+  lcd.print(F("T: "));
 
   lcd.setCursor(72, 20);
   lcd.print((char)248);
-  lcd.print("C");
+  lcd.print(F("C"));
 
   lcd.display();
 }
@@ -252,16 +262,16 @@ void updateDisplay()  // se muestra en el display
   if(newPos!=oldPos || enabled){
     lcd.setTextColor(BoN, not BoN);
     if(newPos<100)
-      lcd.print(" ");
+      lcd.print(F(" "));
     lcd.print(newPos);
     oldPos = newPos;
   }
   else if(!firstTime && oldEnabled && !enabled){
     lcd.setTextColor(BLACK, WHITE);
     if(newPos<100)
-      lcd.print(" ");
+      lcd.print(F(" "));
     lcd.print(newPos);
-    lcd.print("  ");
+    lcd.print(F("  "));
   }
 
   // el proceso esta seteado pero pausado
@@ -273,26 +283,26 @@ void updateDisplay()  // se muestra en el display
     }
     else{
       lcd.setTextColor(BLACK, WHITE);
-      lcd.print("  ");
+      lcd.print(F("  "));
     }
   }
   else if(!firstTime && enabled && oldEnabled){
     lcd.setTextColor(BLACK, WHITE);
-    lcd.print(" ");
+    lcd.print(F(" "));
     lcd.print((char)175);
   }
 
   lcd.display();
 
   // Si cambio la temperatura entonces muestro el nuevo valor
-  if(oldTemp!=newTemp){
+  if( (cNt!=cOt) || (dNt!=dOt) || (uNt!=uOt) ){
     lcd.setTextSize(4);
     lcd.setTextColor(BLACK, WHITE);
 
     if(cOt!=cNt){
       lcd.setCursor(0*6*4, 20);
       if(cNt==0)
-        lcd.print(" ");
+        lcd.print(F(" "));
       else
         lcd.print(cNt);
       cOt = cNt;
@@ -300,7 +310,7 @@ void updateDisplay()  // se muestra en el display
     if(dOt!=dNt){
       lcd.setCursor(1*6*4, 20);
       if(cNt==0 && dNt==0)
-        lcd.print(" ");
+        lcd.print(F(" "));
       else
         lcd.print(dNt);
       dOt = dNt;
@@ -310,8 +320,6 @@ void updateDisplay()  // se muestra en el display
       lcd.print(uNt);
       uOt = uNt;
     }
-
-    oldTemp = newTemp;
     lcd.display();
   }
 
@@ -321,13 +329,19 @@ void updateDisplay()  // se muestra en el display
     lcd.setCursor(0, 55);
     lcd.print((uint16_t)setPoint);
     lcd.setTextColor(BLACK, WHITE);
-    lcd.print(" ");
-    lcd.print(enabled?"Encendido":"Detenido!");
+    lcd.print(F(" "));
+    lcd.print(enabled?F("Encendido"):F("Detenido!"));
     lcd.display();
 
     oldEnabled=enabled;
     oldSetPoint=setPoint;
   }
+  #ifdef DEBUG
+    lcd.setTextSize(1);
+    lcd.setCursor(13*6, 55);
+    lcd.print(oldAdc);
+    lcd.display();
+  #endif
 }
 
 // ISR's
